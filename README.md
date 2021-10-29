@@ -13,15 +13,15 @@
 {
   "repo": [
     {
-      "url": "ssh://git@gitlab.devops.ourrepo:51111/cp/projectfirst.git",
+      "url": "ssh://git@gitlab.devops.ourrepo:51111/cp/project-first.git",
       "branch": "develop"
     },
     {
-      "url": "ssh://git@gitlab.devops.ourrepo:51111/cp/projectsecond.git",
+      "url": "ssh://git@gitlab.devops.ourrepo:51111/cp/project-second.git",
       "branch": "master"
     },
     {
-      "url": "ssh://git@gitlab.devops.ourrepo:51111/cp/projectthird.git",
+      "url": "ssh://git@gitlab.devops.ourrepo:51111/cp/project-third.git",
       "branch": "branch_with_feature"
     }
   ]
@@ -45,37 +45,37 @@ gomodlink --from example.json
  * AVG dependencies - коэффициент, показывающий насколько больше зависимостей от идеального показателя. Вы можете выбрать оптимальное значение для вас и ориентироваться на него.
 ```
 Repository: gitlab.devops.ourdomain.dev/api-gateway (5)
-    gitlab.devops.ourdomain.dev/event-manager/pkg/event-manager-api
-    gitlab.devops.ourdomain.dev/order-manager/pkg/order-manager-api/v2
-    gitlab.devops.ourdomain.dev/item-catalog/pkg/item-catalog-api/v2
+    gitlab.devops.ourdomain.dev/project-first/pkg/project-first-api
+    gitlab.devops.ourdomain.dev/project-second/pkg/project-second-api/v2
+    gitlab.devops.ourdomain.dev/project-third/pkg/project-third-api/v2
     gitlab.devops.ourdomain.dev/customer/pkg/customer-api
-    gitlab.devops.ourdomain.dev/product-item/pkg/product-item-api
+    gitlab.devops.ourdomain.dev/project-fifth/pkg/project-fifth-api
 
-Repository: gitlab.devops.ourdomain.dev/event-manager (5)
-    gitlab.devops.ourdomain.dev/notification/pkg/notification-api
-    gitlab.devops.ourdomain.dev/order-manager/pkg/order-manager-api/v2
-    gitlab.devops.ourdomain.dev/item-catalog/pkg/item-catalog-api/v2
+Repository: gitlab.devops.ourdomain.dev/project-first (5)
+    gitlab.devops.ourdomain.dev/project-fourth/pkg/project-fourth-api
+    gitlab.devops.ourdomain.dev/project-second/pkg/project-second-api/v2
+    gitlab.devops.ourdomain.dev/project-third/pkg/project-third-api/v2
     gitlab.devops.ourdomain.dev/customer/pkg/customer-api
-    gitlab.devops.ourdomain.dev/product-item/pkg/product-item-api
+    gitlab.devops.ourdomain.dev/project-fifth/pkg/project-fifth-api
 
-Repository: gitlab.devops.ourdomain.dev/order-manager (5)
-    gitlab.devops.ourdomain.dev/notification/pkg/notification-api
-    gitlab.devops.ourdomain.dev/event-manager/pkg/event-manager-api
-    gitlab.devops.ourdomain.dev/item-catalog/pkg/item-catalog-api/v2
+Repository: gitlab.devops.ourdomain.dev/project-second (5)
+    gitlab.devops.ourdomain.dev/project-fourth/pkg/project-fourth-api
+    gitlab.devops.ourdomain.dev/project-first/pkg/project-first-api
+    gitlab.devops.ourdomain.dev/project-third/pkg/project-third-api/v2
     gitlab.devops.ourdomain.dev/customer/pkg/customer-api
-    gitlab.devops.ourdomain.dev/product-item/pkg/product-item-api
+    gitlab.devops.ourdomain.dev/project-fifth/pkg/project-fifth-api
 
-Repository: gitlab.devops.ourdomain.dev/notification (2)
+Repository: gitlab.devops.ourdomain.dev/project-fourth (2)
     gitlab.devops.ourdomain.dev/customer/pkg/customer-api
-    gitlab.devops.ourdomain.dev/product-item/pkg/product-item-api
+    gitlab.devops.ourdomain.dev/project-fifth/pkg/project-fifth-api
 
 Repository: gitlab.devops.ourdomain.dev/customer (2)
-    gitlab.devops.ourdomain.dev/event-manager/pkg/event-manager-api
-    gitlab.devops.ourdomain.dev/product-item/pkg/product-item-api
+    gitlab.devops.ourdomain.dev/project-first/pkg/project-first-api
+    gitlab.devops.ourdomain.dev/project-fifth/pkg/project-fifth-api
 
-Repository: gitlab.devops.ourdomain.dev/item-catalog (0)
+Repository: gitlab.devops.ourdomain.dev/project-third (0)
 
-Repository: gitlab.devops.ourdomain.dev/product-item (0)
+Repository: gitlab.devops.ourdomain.dev/project-fifth (0)
 
 Total repository: 7
 Total dependencies: 19
