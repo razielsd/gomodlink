@@ -59,12 +59,22 @@ func main() {
 		return len(fr) > len(sr)
 	})
 
+	depCounter := 0
 	for _, name := range keyList {
 		v := out[name]
 		fmt.Printf("Repository: %s (%d)\n", name, len(v))
 		for _, line := range v {
+			depCounter++
 			fmt.Printf("      %s\n", line)
 		}
 		fmt.Println()
 	}
+	avg := 0.0
+	if len(out) > 1 {
+		avg = float64(depCounter) / float64(len(out) - 1)
+	}
+
+	fmt.Printf("Total repository: %d\n", len(out))
+	fmt.Printf("Total dependencies: %d\n", depCounter)
+	fmt.Printf("AVG dependencies: %.2f\n", avg)
 }
