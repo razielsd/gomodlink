@@ -42,7 +42,7 @@ gomodlink --from example.json
 Пример отчета, где:
  * Total repository - кол-во репозиториев
  * Total dependencies - кол-во найденых зависимостей
- * AVG dependencies - коэффициент, показывающий насколько больше зависимостей от идеального показателя. Вы можете выбрать оптимальное значение для вас и ориентироваться на него.
+ * AVG dependencies - коэффициент, показывающий во сколько раз больше зависимостей от идеального показателя. Вы можете выбрать оптимальное значение для вас и ориентироваться на него.
 ```
 Repository: gitlab.devops.ourdomain.dev/api-gateway (5)
     gitlab.devops.ourdomain.dev/project-first/pkg/project-first-api
