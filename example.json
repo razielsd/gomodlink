@@ -1,0 +1,16 @@
+{
+  "repo": [
+    {
+      "url": "ssh://git@gitlab.devops.ourrepo:51111/cp/projectfirst.git",
+      "branch": "develop"
+    },
+    {
+      "url": "ssh://git@gitlab.devops.ourrepo:51111/cp/projectsecond.git",
+      "branch": "master"
+    },
+    {
+      "url": "ssh://git@gitlab.devops.ourrepo:51111/cp/projectthird.git",
+      "branch": "branch_with_feature"
+    }
+  ]
+}
