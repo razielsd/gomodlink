@@ -1,9 +1,11 @@
-package main
+package repo
 
 import (
-	"bufio"
 	"bytes"
+	"encoding/hex"
 	"fmt"
+	"github.com/razielsd/gomodlink/internal/gomodparser"
+	"math/rand"
 	"net"
 	"net/url"
 	"os"
@@ -14,14 +16,22 @@ import (
 type Repository struct {
 	Url    string
 	Branch string
-	Linked []string
+	Deps   []string
+	Key    string
+	Name   string
+	modUrl string
 }
 
-func NewRepository(url, branch string) *Repository {
+func NewRepository(url, branch, name string) *Repository {
+	b := make([]byte, 4)
+	rand.Read(b)
 	return &Repository{
 		Url:    url,
 		Branch: branch,
-		Linked: make([]string, 0),
+		Name:   name,
+		Deps:   make([]string, 0),
+		modUrl: "",
+		Key:    hex.EncodeToString(b),
 	}
 }
 
@@ -30,33 +40,47 @@ func (r *Repository) Load() error {
 	if err != nil {
 		return err
 	}
-	err = r.parseGoMod(modFile)
+	parser := gomodparser.NewParser()
+	err = parser.Parse(modFile)
 	if err != nil {
 		return err
 	}
+	r.Deps = parser.GetDeps()
 	return nil
 }
 
 func (r *Repository) GetModuleUrl() (string, error) {
+	if r.modUrl != "" {
+		return r.modUrl, nil
+	}
 	u, err := url.Parse(r.Url)
 	if err != nil {
 		return "", err
 	}
 	host, _, _ := net.SplitHostPort(u.Host)
-	mod := strings.TrimSuffix(fmt.Sprintf("%s%s", host, u.Path), ".git")
-	return mod, nil
+	r.modUrl = strings.TrimSuffix(fmt.Sprintf("%s%s", host, u.Path), ".git")
+	return r.modUrl, nil
 }
 
-func (r *Repository) Intersect(l []string) ([]string, error) {
-	result := make([]string, 0)
+func (r *Repository) Intersect(l []*Repository) ([]*Repository, error) {
+	// check build all moduleUrl
+	for _, repo := range l {
+		_, err := repo.GetModuleUrl()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	result := make([]*Repository, 0)
 	modUrl, err := r.GetModuleUrl()
 	if err != nil {
 		return nil, err
 	}
-	for _, s := range l {
-		for _, v := range r.Linked {
+	for _, repo := range l {
+		s, _ := repo.GetModuleUrl()
+		for _, v := range r.Deps {
 			if (strings.HasPrefix(v, s+"/") || (v == s)) && !strings.HasPrefix(v, modUrl) {
-				result = append(result, v)
+				result = append(result, repo)
 				continue
 			}
 		}
@@ -94,23 +118,4 @@ func (r *Repository) download() (string, error) {
 		return "", err
 	}
 	return strings.TrimSpace(out.String()), nil
-}
-
-func (r *Repository) parseGoMod(modFile string) error {
-	scanner := bufio.NewScanner(strings.NewReader(modFile))
-	isReq := false
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if strings.HasPrefix(line, "require") {
-			isReq = true
-			continue
-		} else if line == ")" {
-			isReq = false
-		}
-		if isReq {
-			repoLink := strings.Fields(line)[0]
-			r.Linked = append(r.Linked, repoLink)
-		}
-	}
-	return nil
 }

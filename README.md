@@ -38,6 +38,24 @@ gomodlink --from example.json
 ```
 где файл `example.json` - описание ваших репозиториев
 
+Параметры:
+```
+  -format string
+    	output format [txt, svg] (default "txt")
+  -from string
+    	source file to read from
+  -open
+    	open image after run, support only macos
+  -out string
+    	output filename
+```
+
+Пример, генерируем отчет в виде графа в файл `dep.svg` и сразу открываем его в браузере:
+```
+gomodlink --from repos.json -format svg -out dep.svg -open
+```
+Для генерации графа используется [graphiz](https://graphviz.org/), поэтому его необходимо предварительно [установить](https://graphviz.org/download/).
+
 ## Output
 Пример отчета:
 ```

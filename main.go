@@ -4,28 +4,55 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/razielsd/gomodlink/internal/repo"
+	"io/ioutil"
+	"log"
 	"os"
-	"sort"
+	"os/exec"
+	"runtime"
 )
 
-var from string
+const (
+	formatTxt string = "txt"
+	formatSvg string = "svg"
+)
+
+var (
+	from, format, outfile string
+	openFile              bool
+)
 
 func init() {
 	flag.StringVar(&from, "from", "", "source file to read from")
+	flag.StringVar(&format, "format", "txt", "output format [txt, svg]")
+	flag.StringVar(&outfile, "out", "", "output filename")
+	flag.BoolVar(&openFile, "open", false, "open image after run, support only macos")
 }
 
-func showHelp() {
-	fmt.Println("Params:")
-	fmt.Println("  from - repository configuration, see example.json")
-	fmt.Println("Example: gomodlink --from example.json")
-	fmt.Println()
+func openbrowser(url string) {
+	var err error
+
+	switch runtime.GOOS {
+	case "linux":
+		err = exec.Command("xdg-open", url).Start()
+	case "windows":
+		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		err = exec.Command("open", url).Start()
+	default:
+		err = fmt.Errorf("unsupported platform")
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
 }
+
 
 func main() {
 	flag.Parse()
 	if from == "" {
 		fmt.Println("Error: require param: from")
-		showHelp()
+		flag.Usage()
 		os.Exit(1)
 	}
 	if _, err := os.Stat(from); errors.Is(err, os.ErrNotExist) {
@@ -33,7 +60,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	repoList := RepoList{}
+	repoList := repo.RepoList{}
 	err := repoList.LoadFromFile(from)
 	if err != nil {
 		fmt.Printf("Error load repository configuration: %s\n", err.Error())
@@ -45,36 +72,28 @@ func main() {
 		fmt.Printf("Error: %s\n", err)
 		os.Exit(1)
 	}
-
-	out, _ := repoList.Intersect()
-
-	keyList := make([]string, 0)
-	for i := range out {
-		keyList = append(keyList, i)
+	writer := &repo.ReportWriter{
+		Repolist: &repoList,
 	}
+	in, _ := repoList.Intersect()
 
-	sort.Slice(keyList, func(i, j int) bool {
-		fr := out[keyList[i]]
-		sr := out[keyList[j]]
-		return len(fr) > len(sr)
-	})
-
-	depCounter := 0
-	for _, name := range keyList {
-		v := out[name]
-		fmt.Printf("Repository: %s (%d)\n", name, len(v))
-		for _, line := range v {
-			depCounter++
-			fmt.Printf("      %s\n", line)
+	switch format {
+	case formatTxt:
+		out := writer.BuildText(in)
+		if outfile == "" {
+			fmt.Println(out)
+		} else {
+			if err := ioutil.WriteFile(outfile, []byte(out), 0o644); err != nil {
+				fmt.Printf("ERROR: unable write report - %s\n", err.Error())
+			}
 		}
-		fmt.Println()
+	case formatSvg:
+		if err := writer.BuildGraphviz(in, outfile); err != nil {
+			fmt.Printf("ERROR: %s\n", err.Error())
+		}
+		if openFile {
+			openbrowser(outfile)
+		}
 	}
-	avg := 0.0
-	if len(out) > 1 {
-		avg = float64(depCounter) / float64(len(out) - 1)
-	}
-
-	fmt.Printf("Total repository: %d\n", len(out))
-	fmt.Printf("Total dependencies: %d\n", depCounter)
-	fmt.Printf("AVG dependencies: %.2f\n", avg)
 }
+
