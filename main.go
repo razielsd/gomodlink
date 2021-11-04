@@ -15,6 +15,7 @@ import (
 const (
 	formatTxt string = "txt"
 	formatSvg string = "svg"
+	formatPng string = "png"
 )
 
 var (
@@ -83,12 +84,12 @@ func main() {
 		if outfile == "" {
 			fmt.Println(out)
 		} else {
-			if err := ioutil.WriteFile(outfile, []byte(out), 0o644); err != nil {
+			if err := ioutil.WriteFile(outfile, []byte(out), 0644); err != nil {
 				fmt.Printf("ERROR: unable write report - %s\n", err.Error())
 			}
 		}
-	case formatSvg:
-		if err := writer.BuildGraphviz(in, outfile); err != nil {
+	case formatSvg, formatPng:
+		if err := writer.BuildGraphviz(in, outfile, format); err != nil {
 			fmt.Printf("ERROR: %s\n", err.Error())
 		}
 		if openFile {

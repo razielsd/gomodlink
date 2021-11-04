@@ -41,7 +41,7 @@ gomodlink --from example.json
 Параметры:
 ```
   -format string
-    	output format [txt, svg] (default "txt")
+    	output format [txt, svg, png] (default "txt")
   -from string
     	source file to read from
   -open

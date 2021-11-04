@@ -59,7 +59,7 @@ func (r *ReportWriter) BuildText(in map[string][]*Repository) string {
 	return out.String()
 }
 
-func (r *ReportWriter) BuildGraphviz(in map[string][]*Repository, filename string) error {
+func (r *ReportWriter) BuildGraphviz(in map[string][]*Repository, filename string, format string) error {
 	out := bytes.NewBufferString("digraph gomodlink { \n")
 
 	for _, repo := range r.Repolist.GetAll() {
@@ -88,7 +88,7 @@ func (r *ReportWriter) BuildGraphviz(in map[string][]*Repository, filename strin
 	destFile.Close()
 
 	cmdArg := strings.Fields(
-		fmt.Sprintf("-Tsvg %s -o %s", destFile.Name(), filename),
+		fmt.Sprintf("-T%s %s -o %s", format, destFile.Name(), filename),
 	)
 	cmd := exec.Command("dot", cmdArg...)
 	if _, err := cmd.Output(); err != nil {
