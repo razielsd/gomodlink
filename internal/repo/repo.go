@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"github.com/razielsd/gomodlink/internal/giturl"
 	"github.com/razielsd/gomodlink/internal/gomodparser"
 	"math/rand"
-	"net"
-	"net/url"
 	"os"
 	"os/exec"
 	"strings"
@@ -53,13 +52,11 @@ func (r *Repository) GetModuleUrl() (string, error) {
 	if r.modUrl != "" {
 		return r.modUrl, nil
 	}
-	u, err := url.Parse(r.Url)
+	u, err := giturl.Parse(r.Url)
 	if err != nil {
 		return "", err
 	}
-	host, _, _ := net.SplitHostPort(u.Host)
-	r.modUrl = strings.TrimSuffix(fmt.Sprintf("%s%s", host, u.Path), ".git")
-	return r.modUrl, nil
+	return u.ModuleUrl, nil
 }
 
 func (r *Repository) Intersect(l []*Repository) ([]*Repository, error) {

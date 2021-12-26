@@ -36,7 +36,3 @@ func TestRepository_Intersect(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, expected, result)
 }
-
-func TestRepoList_Load(t *testing.T) {
-
-}
