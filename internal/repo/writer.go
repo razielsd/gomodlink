@@ -59,12 +59,12 @@ func (r *ReportWriter) BuildText(in map[string][]*Repository) string {
 	return out.String()
 }
 
-func (r *ReportWriter) BuildGraphviz(in map[string][]*Repository, filename string, format string) error {
+func (r *ReportWriter) BuildGraphviz(in map[string][]*Repository, filename, format string) error {
 	out := bytes.NewBufferString("digraph gomodlink { \n")
 
 	for _, repo := range r.Repolist.GetAll() {
 		_, _ = fmt.Fprintf(out,
-			"%s [label=\"%s\", URL=\"%s\", tooltip=\"%s\"];\n", repo.Key, repo.Name, repo.Url, repo.Name,
+			"%s [label=\"%s\", URL=\"%s\", tooltip=\"%s\"];\n", repo.Key, repo.Name, repo.URL, repo.Name,
 		)
 	}
 

@@ -4,32 +4,36 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	"github.com/razielsd/gomodlink/internal/giturl"
-	"github.com/razielsd/gomodlink/internal/gomodparser"
 	"math/rand"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/razielsd/gomodlink/internal/giturl"
+	"github.com/razielsd/gomodlink/internal/gomodparser"
 )
 
+const tryDownload = 5
+
 type Repository struct {
-	Url    string
+	URL    string
 	Branch string
 	Deps   []string
 	Key    string
 	Name   string
-	modUrl string
+	modURL string
 }
 
 func NewRepository(url, branch, name string) *Repository {
-	b := make([]byte, 4)
-	rand.Read(b)
+	const parts = 4
+	b := make([]byte, parts)
+	rand.Read(b) //nolint:gosec
 	return &Repository{
-		Url:    url,
+		URL:    url,
 		Branch: branch,
 		Name:   name,
 		Deps:   make([]string, 0),
-		modUrl: "",
+		modURL: "",
 		Key:    hex.EncodeToString(b),
 	}
 }
@@ -40,43 +44,42 @@ func (r *Repository) Load() error {
 		return err
 	}
 	parser := gomodparser.NewParser()
-	err = parser.Parse(modFile)
-	if err != nil {
+	if err := parser.Parse(modFile); err != nil {
 		return err
 	}
 	r.Deps = parser.GetDeps()
 	return nil
 }
 
-func (r *Repository) GetModuleUrl() (string, error) {
-	if r.modUrl != "" {
-		return r.modUrl, nil
+func (r *Repository) GetModuleURL() (string, error) {
+	if r.modURL != "" {
+		return r.modURL, nil
 	}
-	u, err := giturl.Parse(r.Url)
+	u, err := giturl.Parse(r.URL)
 	if err != nil {
 		return "", err
 	}
-	return u.ModuleUrl, nil
+	return u.ModuleURL, nil
 }
 
 func (r *Repository) Intersect(l []*Repository) ([]*Repository, error) {
 	// check build all moduleUrl
 	for _, repo := range l {
-		_, err := repo.GetModuleUrl()
+		_, err := repo.GetModuleURL()
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	result := make([]*Repository, 0)
-	modUrl, err := r.GetModuleUrl()
+	modURL, err := r.GetModuleURL()
 	if err != nil {
 		return nil, err
 	}
 	for _, repo := range l {
-		s, _ := repo.GetModuleUrl()
+		s, _ := repo.GetModuleURL()
 		for _, v := range r.Deps {
-			if (strings.HasPrefix(v, s+"/") || (v == s)) && !strings.HasPrefix(v, modUrl) {
+			if (strings.HasPrefix(v, s+"/") || (v == s)) && !strings.HasPrefix(v, modURL) {
 				result = append(result, repo)
 				continue
 			}
@@ -86,8 +89,20 @@ func (r *Repository) Intersect(l []*Repository) ([]*Repository, error) {
 }
 
 func (r *Repository) download() (string, error) {
+	var err error
+	var modFile string
+	for i := tryDownload; i > 0; i-- {
+		modFile, err = r.tryDownload()
+		if err == nil {
+			return modFile, nil
+		}
+	}
+	return "", fmt.Errorf("error download go.mod(%s)", r.URL)
+}
+
+func (r *Repository) tryDownload() (string, error) {
 	cmdArg := strings.Fields(
-		fmt.Sprintf("archive --remote=%s %s go.mod", r.Url, r.Branch),
+		fmt.Sprintf("archive --remote=%s %s go.mod", r.URL, r.Branch),
 	)
 	gitCmd := exec.Command("git", cmdArg...)
 	tarCmd := exec.Command("tar", "-xO")

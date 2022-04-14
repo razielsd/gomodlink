@@ -9,7 +9,7 @@ import (
 func TestRepository_GetModuleUrl(t *testing.T) {
 	repo := NewRepository("ssh://git@gitlab.ourrepo.dev:21722/dbg/item-catalog.git", "develop", "item")
 
-	modUrl, err := repo.GetModuleUrl()
+	modUrl, err := repo.GetModuleURL()
 	require.NoError(t, err)
 	require.Equal(t, "gitlab.ourrepo.dev/dbg/item-catalog", modUrl)
 }

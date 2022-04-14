@@ -1,7 +1,6 @@
 package repo
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,11 +9,11 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type RepoList struct {
+type RepoList struct { //nolint:revive
 	repoList []*Repository
 }
 
-type RepoJson struct {
+type RepoJSON struct { //nolint:revive
 	Repo []struct {
 		Branch string `json:"branch"`
 		URL    string `json:"url"`
@@ -32,7 +31,7 @@ func (l *RepoList) GetAll() []*Repository {
 }
 
 func (l *RepoList) Load() error {
-	g, _ := errgroup.WithContext(context.Background())
+	g := &errgroup.Group{}
 	for _, repo := range l.repoList {
 		repo := repo
 		g.Go(func() error {
@@ -62,7 +61,7 @@ func (l *RepoList) LoadFromFile(filename string) error {
 	if err != nil {
 		return err
 	}
-	data := &RepoJson{}
+	data := &RepoJSON{}
 	err = json.Unmarshal(content, data)
 	if err != nil {
 		return err

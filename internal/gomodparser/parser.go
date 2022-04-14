@@ -10,7 +10,9 @@ type Parser struct {
 }
 
 func NewParser() *Parser {
-	return &Parser{}
+	return &Parser{
+		deps: make([]string, 0),
+	}
 }
 
 func (p *Parser) Parse(modFile string) error {
@@ -18,6 +20,9 @@ func (p *Parser) Parse(modFile string) error {
 	isReq := false
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
+		if line == "" {
+			continue
+		}
 		if strings.HasPrefix(line, "require") {
 			isReq = true
 			continue
@@ -36,4 +41,3 @@ func (p *Parser) Parse(modFile string) error {
 func (p *Parser) GetDeps() []string {
 	return p.deps
 }
-

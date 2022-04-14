@@ -1,8 +1,9 @@
 package giturl
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestGitUrl_Parse(t *testing.T) {
@@ -12,12 +13,12 @@ func TestGitUrl_Parse(t *testing.T) {
 		modurl string
 	}{
 		{
-			name: "git",
+			name:   "git",
 			giturl: "git@git.ourrepo.tech:path/to/module//customer-manager.git",
 			modurl: "git.ourrepo.tech/path/to/module//customer-manager",
 		},
 		{
-			name: "https",
+			name:   "https",
 			giturl: "https://git.ourrepo.tech/path/to/module//customer-manager.git",
 			modurl: "git.ourrepo.tech/path/to/module//customer-manager",
 		},
@@ -28,7 +29,7 @@ func TestGitUrl_Parse(t *testing.T) {
 			repo, err := Parse(tt.giturl)
 			require.NoError(t, err)
 			require.NotNil(t, repo)
-			require.Equal(t, tt.modurl, repo.ModuleUrl)
+			require.Equal(t, tt.modurl, repo.ModuleURL)
 		})
 	}
 }

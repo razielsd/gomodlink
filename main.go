@@ -4,12 +4,13 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/razielsd/gomodlink/internal/repo"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"runtime"
+
+	"github.com/razielsd/gomodlink/internal/repo"
 )
 
 const (
@@ -22,6 +23,8 @@ var (
 	from, format, outfile string
 	openFile              bool
 )
+
+const reportFilePerm = 0o600
 
 func init() {
 	flag.StringVar(&from, "from", "", "source file to read from")
@@ -48,7 +51,6 @@ func openbrowser(url string) {
 	}
 }
 
-
 func main() {
 	flag.Parse()
 	if from == "" {
@@ -67,7 +69,6 @@ func main() {
 		fmt.Printf("Error load repository configuration: %s\n", err.Error())
 		os.Exit(1)
 	}
-
 	err = repoList.Load()
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
@@ -83,10 +84,8 @@ func main() {
 		out := writer.BuildText(in)
 		if outfile == "" {
 			fmt.Println(out)
-		} else {
-			if err := ioutil.WriteFile(outfile, []byte(out), 0644); err != nil {
-				fmt.Printf("ERROR: unable write report - %s\n", err.Error())
-			}
+		} else if err := ioutil.WriteFile(outfile, []byte(out), reportFilePerm); err != nil {
+			fmt.Printf("ERROR: unable write report - %s\n", err.Error())
 		}
 	case formatSvg, formatPng:
 		if err := writer.BuildGraphviz(in, outfile, format); err != nil {
@@ -97,4 +96,3 @@ func main() {
 		}
 	}
 }
-

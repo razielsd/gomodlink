@@ -1,8 +1,9 @@
 package gomodparser
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewParser(t *testing.T) {
@@ -10,7 +11,6 @@ func TestNewParser(t *testing.T) {
 }
 
 func TestParser_Parse(t *testing.T) {
-
 	gomodfile := `module github.com/razielsd/gomodlink
 
 go 1.17
