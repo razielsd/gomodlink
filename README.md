@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/razielsd/gomodlink)](https://goreportcard.com/report/github.com/razielsd/gomodlink)
+
 # Go.Mod Link
 
 ## Overview
